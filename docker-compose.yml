@@ -1,11 +1,12 @@
 version: '3.8'
+
 services:
   db:
     image: mongo:latest
     ports:
       - "27017:27017"
     volumes:
-      - mongo-data:/data/db 
+      - mongo-data:/data/db
 
   backend:
     build: ./backend
@@ -13,6 +14,9 @@ services:
       - "3000:3000"
     environment:
       - MONGO_URI=mongodb://db:27017/myapp
+    volumes:
+      - ./backend:/app
+      - /app/node_modules 
     depends_on:
       - db
 
@@ -20,8 +24,14 @@ services:
     build: ./frontend
     ports:
       - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+      - CHOKIDAR_USEPOLLING=true 
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
 
 volumes:
-  mongo-data: 
+  mongo-data:
